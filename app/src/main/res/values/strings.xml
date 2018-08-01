@@ -6,8 +6,10 @@
     <string name="header_user_rating_label">User rating</string>
     <string name="poster_content_description">Poster of the movie</string>
     <string name="background_content_description">Picture of the movie</string>
-    <string name="header_trailer_label">Trailer</string>
+    <string name="header_trailer_label">Trailers</string>
+    <string name="trailer_label">Trailer</string>
     <string name="btn_watch_trailer">Watch</string>
+    <string name="review_by">Reviewed by</string>
 
     <string-array name="sort_order_array">
         <item>Most Popular</item>

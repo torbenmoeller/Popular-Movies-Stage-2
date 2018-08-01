@@ -82,14 +82,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/header_trailer_label"
-            android:textSize="14sp" />
+            android:textSize="1sp"
+            android:textStyle="bold"  />
 
-        <Button
-            android:id="@+id/btn_watch_trailer"
+        <LinearLayout
+            android:id="@+id/list_trailers"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Button"
-            tools:text="@string/btn_watch_trailer" />
+            android:orientation="vertical"></LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/list_reviews"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"></LinearLayout>
 
     </LinearLayout>
 
