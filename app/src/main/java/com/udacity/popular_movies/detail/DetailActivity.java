@@ -6,9 +6,11 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Movie;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -59,6 +61,8 @@ public class DetailActivity extends AppCompatActivity {
     LinearLayout list_reviews;
     @BindString(R.string.review_by)
     String review_by;
+    @BindView(R.id.btn_favorit)
+    Button btn_favorit;
 
     int movie_id;
     String movie_title;
@@ -111,10 +115,27 @@ public class DetailActivity extends AppCompatActivity {
             for (Reviews review : movieDb.getReviews()){
                 createReview(review);
             }
+            Long favId = getFavoritId();
+            if(favId == null){
+                setBtnFavoritOff();
+            } else{
+                setBtnFavoritOn();
+            }
         } catch (Exception e) {
             Log.e("DetailActivity", e.getMessage());
             closeOnError();
         }
+    }
+
+    //Source stackoverflow: https://stackoverflow.com/questions/12523005/how-set-background-drawable-programmatically-in-android
+    void setBtnFavoritOn(){
+        Drawable drawable = ContextCompat.getDrawable(this, R.drawable.btn_star_big_on);
+        btn_favorit.setBackground(drawable);
+    }
+
+    void setBtnFavoritOff(){
+        Drawable drawable = ContextCompat.getDrawable(this, R.drawable.btn_star_big_off);
+        btn_favorit.setBackground(drawable);
     }
 
     @OnClick(R.id.btn_favorit)
@@ -122,8 +143,10 @@ public class DetailActivity extends AppCompatActivity {
         Long id = getFavoritId();
         if(id == null) {
             addFavorit();
+            setBtnFavoritOn();
         }else{
             removeFavorit(id);
+            setBtnFavoritOff();
         }
 
     }
