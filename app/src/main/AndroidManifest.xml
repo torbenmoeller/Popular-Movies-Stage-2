@@ -17,6 +17,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".detail.DetailActivity" />
+        <provider
+            android:name="com.udacity.popular_movies.data.FavoriteContentProvider"
+            android:authorities="com.udacity.popular_movies.favorit"
+            android:exported="false"/>
     </application>
+
 
 </manifest>

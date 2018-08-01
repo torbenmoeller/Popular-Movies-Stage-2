@@ -1,7 +1,9 @@
 package com.udacity.popular_movies.detail;
 
 import android.content.ActivityNotFoundException;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Movie;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -21,6 +23,8 @@ import com.udacity.popular_movies.BuildConfig;
 import com.udacity.popular_movies.Config;
 import com.udacity.popular_movies.MovieViewHolder;
 import com.udacity.popular_movies.R;
+import com.udacity.popular_movies.data.FavoriteContract;
+import com.udacity.popular_movies.data.FavoriteEntry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +60,10 @@ public class DetailActivity extends AppCompatActivity {
     @BindString(R.string.review_by)
     String review_by;
 
+    int movie_id;
+    String movie_title;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         try {
@@ -88,6 +96,10 @@ public class DetailActivity extends AppCompatActivity {
                     .load(completePath)
                     .into(imageView);
             MovieDb movieDb = container.getMovieDb();
+
+            movie_id = movieDb.getId();
+            movie_title = movieDb.getTitle();
+
             List<String> trailers = container.getTrailers();
             tv_title.setText(movieDb.getTitle());
             tv_synopsis.setText(movieDb.getOverview());
@@ -103,6 +115,44 @@ public class DetailActivity extends AppCompatActivity {
             Log.e("DetailActivity", e.getMessage());
             closeOnError();
         }
+    }
+
+    @OnClick(R.id.btn_favorit)
+    void favoritButtonClick(View view) {
+        Long id = getFavoritId();
+        if(id == null) {
+            addFavorit();
+        }else{
+            removeFavorit(id);
+        }
+
+    }
+
+    void addFavorit(){
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(FavoriteEntry.COLUMN_MOVIE_ID, movie_id);
+        contentValues.put(FavoriteEntry.COLUMN_MOVIE_TITLE, movie_title);
+        getContentResolver().insert(FavoriteContract.CONTENT_URI, contentValues);
+    }
+
+    Long getFavoritId(){
+        Cursor cursor = getContentResolver().query(
+                FavoriteContract.CONTENT_URI,
+                null,
+                FavoriteEntry.COLUMN_MOVIE_ID + " = ?",
+                new String[]{String.valueOf(movie_id)},
+                FavoriteEntry.COLUMN_MOVIE_ID
+        );
+        if(cursor != null && cursor.moveToFirst()){ //Thanks to StackOverflow: https://stackoverflow.com/questions/10244222/android-database-cursorindexoutofboundsexception-index-0-requested-with-a-size
+            return cursor.getLong(cursor.getColumnIndex("_id"));
+        } else {
+            return null;
+        }
+    }
+
+    void removeFavorit(Long id){
+        Uri uri = FavoriteContract.CONTENT_URI.buildUpon().appendPath(id.toString()).build();
+        getContentResolver().delete(uri,null,null);
     }
 
     private void createTrailerButton(final String trailerKey, int number){
