@@ -162,10 +162,15 @@ public class DetailActivity extends AppCompatActivity {
                 new String[]{String.valueOf(movie_id)},
                 FavoriteEntry.COLUMN_MOVIE_ID
         );
-        if(cursor != null && cursor.moveToFirst()){ //Thanks to StackOverflow: https://stackoverflow.com/questions/10244222/android-database-cursorindexoutofboundsexception-index-0-requested-with-a-size
-            return cursor.getLong(cursor.getColumnIndex("_id"));
-        } else {
-            return null;
+        try {
+            if (cursor != null && cursor.moveToFirst()) { //Thanks to StackOverflow: https://stackoverflow.com/questions/10244222/android-database-cursorindexoutofboundsexception-index-0-requested-with-a-size
+                return cursor.getLong(cursor.getColumnIndex("_id"));
+            } else {
+                return null;
+            }
+        }
+        finally {
+            cursor.close();
         }
     }
 

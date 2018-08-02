@@ -37,11 +37,11 @@ public class MovieViewHolder extends RecyclerView.ViewHolder
         this.contentResolver = contentResolver;
     }
 
-    void bind(int position, SortOrder sortOrder ) {
+    void bind(int position, SortOrder sortOrder) {
         new MovieResultPageTask(position, sortOrder, contentResolver).execute();
     }
 
-    private void fillViewHolder(MovieDb movieDb, String completePath){
+    private void fillViewHolder(MovieDb movieDb, String completePath) {
         ImageView imageView = view.findViewById(R.id.image_item);
         imageView.setOnClickListener(this);
         this.movie = movieDb;
@@ -67,7 +67,7 @@ public class MovieViewHolder extends RecyclerView.ViewHolder
 
         MovieResultPageTask(int position, SortOrder sortOrder, ContentResolver contentResolver) {
             this.position = position;
-            this.pageCount = position / PAGE_LENGTH + 1 ; //Which page to load, starts at offset 1
+            this.pageCount = position / PAGE_LENGTH + 1; //Which page to load, starts at offset 1
             this.pageOffset = position % PAGE_LENGTH; //Move on page
             this.sortOrder = sortOrder;
             this.contentResolver = contentResolver;
@@ -80,7 +80,7 @@ public class MovieViewHolder extends RecyclerView.ViewHolder
             switch (sortOrder) {
                 case Favorite:
                     List<Integer> favorites = getFavorites();
-                    if(position >= favorites.size()){
+                    if (position >= favorites.size()) {
                         return null; //Invalid size
                     }
                     int movieId = favorites.get(position);
@@ -90,14 +90,14 @@ public class MovieViewHolder extends RecyclerView.ViewHolder
                     return page.getResults().get(pageOffset);
                 case PopularityDescending:
                 default: //default, if error happened
-                    page =  api.getMovies().getPopularMovies(Config.getLanguage(), pageCount);
+                    page = api.getMovies().getPopularMovies(Config.getLanguage(), pageCount);
                     return page.getResults().get(pageOffset);
             }
         }
 
         @Override
         protected void onPostExecute(MovieDb movieDb) {
-            if(movieDb != null) {
+            if (movieDb != null) {
                 String path = movieDb.getPosterPath();
                 String completePath = api.getConfiguration().getBaseUrl() + Config.getResolution() + path;
                 fillViewHolder(movieDb, completePath);
@@ -105,7 +105,7 @@ public class MovieViewHolder extends RecyclerView.ViewHolder
         }
 
 
-        List<Integer> getFavorites(){
+        List<Integer> getFavorites() {
             Cursor cursor = contentResolver.query(
                     FavoriteContract.CONTENT_URI,
                     null,
@@ -113,20 +113,24 @@ public class MovieViewHolder extends RecyclerView.ViewHolder
                     null,
                     FavoriteEntry.COLUMN_MOVIE_ID
             );
-            if(cursor != null && cursor.moveToFirst()){ //Thanks to StackOverflow: https://stackoverflow.com/questions/10244222/android-database-cursorindexoutofboundsexception-index-0-requested-with-a-size
-                List<Integer> favoritesIds= new ArrayList<>();
-                while(cursor.moveToNext()){
-                    Integer id = cursor.getInt(cursor.getColumnIndex(FavoriteEntry.COLUMN_MOVIE_ID));
-                    favoritesIds.add(id);
+            try {
+                if (cursor != null && cursor.moveToFirst()) { //Thanks to StackOverflow: https://stackoverflow.com/questions/10244222/android-database-cursorindexoutofboundsexception-index-0-requested-with-a-size
+                    List<Integer> favoritesIds = new ArrayList<>();
+                    while (cursor.moveToNext()) {
+                        Integer id = cursor.getInt(cursor.getColumnIndex(FavoriteEntry.COLUMN_MOVIE_ID));
+                        favoritesIds.add(id);
+                    }
+                    return favoritesIds;
+                } else {
+                    return null;
                 }
-                return favoritesIds;
-            } else {
-                return null;
+            } finally {
+                cursor.close();
             }
         }
 
-        protected MovieDb getMovieByID(int movieId){
-            return api.getMovies().getMovie(movieId ,Config.getLanguage());
+        protected MovieDb getMovieByID(int movieId) {
+            return api.getMovies().getMovie(movieId, Config.getLanguage());
         }
     }
 }

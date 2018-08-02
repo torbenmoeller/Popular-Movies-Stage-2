@@ -3,8 +3,6 @@ package com.udacity.popular_movies.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.net.Uri;
-import android.provider.BaseColumns;
 
 public class FavoriteDbHelper extends SQLiteOpenHelper {
 
