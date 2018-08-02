@@ -11,9 +11,15 @@
     <string name="btn_watch_trailer">Watch</string>
     <string name="review_by">Reviewed by</string>
 
+
+    <string name="most_popular">Most Popular</string>
+    <string name="highest_rating">Highest Rating</string>
+    <string name="favorites">Favorites</string>
+
     <string-array name="sort_order_array">
-        <item>Most Popular</item>
-        <item>Highest Rating</item>
+        <item>@string/most_popular</item>
+        <item>@string/highest_rating</item>
+        <item>@string/favorites</item>
     </string-array>
 
 </resources>

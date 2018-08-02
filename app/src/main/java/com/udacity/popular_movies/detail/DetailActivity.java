@@ -1,10 +1,8 @@
 package com.udacity.popular_movies.detail;
 
-import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Movie;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -23,7 +21,6 @@ import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 import com.udacity.popular_movies.BuildConfig;
 import com.udacity.popular_movies.Config;
-import com.udacity.popular_movies.MovieViewHolder;
 import com.udacity.popular_movies.R;
 import com.udacity.popular_movies.data.FavoriteContract;
 import com.udacity.popular_movies.data.FavoriteEntry;
@@ -148,7 +145,6 @@ public class DetailActivity extends AppCompatActivity {
             removeFavorit(id);
             setBtnFavoritOff();
         }
-
     }
 
     void addFavorit(){

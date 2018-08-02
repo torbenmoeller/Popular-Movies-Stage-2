@@ -12,6 +12,7 @@ import android.widget.Spinner;
 
 import com.udacity.popular_movies.detail.DetailActivity;
 
+import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -23,6 +24,13 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
     RecyclerView recycler_view;
     @BindView(R.id.spinner)
     Spinner spinner;
+
+    @BindString(R.string.most_popular)
+    String most_popular;
+    @BindString(R.string.highest_rating)
+    String highest_rating;
+    @BindString(R.string.favorites)
+    String favorites;
 
     Unbinder unbinder;
 
@@ -38,20 +46,23 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
         GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
         recycler_view.setLayoutManager(layoutManager);
         recycler_view.setHasFixedSize(true);
-        mAdapter = new MovieAdapter(this, sortOrder);
+        mAdapter = new MovieAdapter(this, sortOrder, getContentResolver());
         recycler_view.setAdapter(mAdapter);
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedItem = (String) spinner.getSelectedItem();
-                Log.d("Sort order changed to", selectedItem);
-                if ("Most Popular".equals(selectedItem)) {
+                if(selectedItem.equals(most_popular)){
                     sortOrder = SortOrder.PopularityDescending;
-                } else {
+                }
+                else if(selectedItem.equals(highest_rating)){
                     sortOrder = SortOrder.RatingDescending;
                 }
-                mAdapter = new MovieAdapter(MainActivity.this, sortOrder);
+                else {
+                    sortOrder = SortOrder.Favorite;
+                }
+                mAdapter = new MovieAdapter(MainActivity.this, sortOrder, getContentResolver());
                 recycler_view.invalidate();
                 recycler_view.setAdapter(mAdapter);
             }
