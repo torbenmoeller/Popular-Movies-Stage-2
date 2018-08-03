@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -28,6 +29,7 @@ public class MovieViewHolder extends RecyclerView.ViewHolder
     private final Context context;
     private final int PAGE_LENGTH = 20; //entries per movieResultPage
     private ContentResolver contentResolver;
+    protected static TmdbApi api;
 
     MovieViewHolder(Context context, View itemView, ListItemClickListener mOnClickListener, ContentResolver contentResolver) {
         super(itemView);
@@ -43,11 +45,21 @@ public class MovieViewHolder extends RecyclerView.ViewHolder
 
     private void fillViewHolder(MovieDb movieDb, String completePath) {
         ImageView imageView = view.findViewById(R.id.image_item);
-        imageView.setOnClickListener(this);
+        if(movieDb!= null) {
+            imageView.setOnClickListener(this);
+        }
+        else{
+            imageView.setOnClickListener(null);
+        }
         this.movie = movieDb;
-        Picasso.with(context)
-                .load(completePath)
-                .into(imageView);
+        Log.d("Picasso", "Get pic from path " + completePath);
+        if(completePath!= null) {
+            Picasso.with(context)
+                    .load(completePath)
+                    .into(imageView);
+        }else { //reset
+            imageView.setImageDrawable(null);
+        }
         view.refreshDrawableState();
     }
 
@@ -58,7 +70,6 @@ public class MovieViewHolder extends RecyclerView.ViewHolder
 
     class MovieResultPageTask extends AsyncTask<Void, Void, MovieDb> {
 
-        private TmdbApi api;
         private final int position;
         private final int pageCount;
         private final int pageOffset;
@@ -75,21 +86,25 @@ public class MovieViewHolder extends RecyclerView.ViewHolder
 
         @Override
         protected MovieDb doInBackground(Void... params) {
-            api = new TmdbApi(BuildConfig.TMDB_API_KEY);
+            if(api == null){
+                api = new TmdbApi(BuildConfig.TMDB_API_KEY);
+            }
             MovieResultsPage page;
             switch (sortOrder) {
                 case Favorite:
-                    List<Integer> favorites = getFavorites();
-                    if (position >= favorites.size()) {
-                        return null; //Invalid size
+                    Log.d("Page", "Get Fav " + position);
+                    Integer movieId = getFavorites(Integer.toString(position - 1));
+                    if(movieId == null){
+                        return null;
                     }
-                    int movieId = favorites.get(position);
                     return getMovieByID(movieId);
                 case RatingDescending:
+                    Log.d("Page", "Get Page " + pageCount);
                     page = api.getMovies().getTopRatedMovies(Config.getLanguage(), pageCount);
                     return page.getResults().get(pageOffset);
                 case PopularityDescending:
                 default: //default, if error happened
+                    Log.d("Page", "Get Page " + pageCount);
                     page = api.getMovies().getPopularMovies(Config.getLanguage(), pageCount);
                     return page.getResults().get(pageOffset);
             }
@@ -102,31 +117,34 @@ public class MovieViewHolder extends RecyclerView.ViewHolder
                 String completePath = api.getConfiguration().getBaseUrl() + Config.getResolution() + path;
                 fillViewHolder(movieDb, completePath);
             }
+            else{
+                fillViewHolder(null, null);
+            }
         }
 
 
-        List<Integer> getFavorites() {
+        Integer getFavorites(String position) {
             Cursor cursor = contentResolver.query(
                     FavoriteContract.CONTENT_URI,
                     null,
-                    null,
-                    null,
-                    FavoriteEntry.COLUMN_MOVIE_ID
+                    FavoriteEntry._ID + " = ?",
+                    new String[]{position},
+                    FavoriteEntry._ID
             );
+//            if(position >= cursor.getCount()){
+//                return null;
+//            }
             try {
-                if (cursor != null && cursor.moveToFirst()) { //Thanks to StackOverflow: https://stackoverflow.com/questions/10244222/android-database-cursorindexoutofboundsexception-index-0-requested-with-a-size
-                    List<Integer> favoritesIds = new ArrayList<>();
-                    while (cursor.moveToNext()) {
-                        Integer id = cursor.getInt(cursor.getColumnIndex(FavoriteEntry.COLUMN_MOVIE_ID));
-                        favoritesIds.add(id);
-                    }
-                    return favoritesIds;
-                } else {
-                    return null;
+                if (cursor != null && cursor.moveToFirst()){// cursor.moveToPosition(position)) { //Thanks to StackOverflow: https://stackoverflow.com/questions/11139740/find-nth-row-in-sqlitedatabase-in-android
+                        Integer movieId = cursor.getInt(cursor.getColumnIndex(FavoriteEntry.COLUMN_MOVIE_ID));
+                        Log.d("DB-query", "MovieId returned " + movieId);
+                        return movieId;
                 }
             } finally {
                 cursor.close();
             }
+            Log.d("DB-query", "MovieId not found ");
+            return null;
         }
 
         protected MovieDb getMovieByID(int movieId) {

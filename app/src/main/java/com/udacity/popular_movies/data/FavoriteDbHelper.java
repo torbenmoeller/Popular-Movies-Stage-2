@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class FavoriteDbHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "favoritesDb.db";
-    private static final int VERSION = 2;
+    private static final int VERSION = 3;
     FavoriteDbHelper(Context context) {
         super(context, DATABASE_NAME, null, VERSION);
     }

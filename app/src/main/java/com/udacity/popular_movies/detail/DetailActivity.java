@@ -150,7 +150,7 @@ public class DetailActivity extends AppCompatActivity {
     void addFavorit(){
         ContentValues contentValues = new ContentValues();
         contentValues.put(FavoriteEntry.COLUMN_MOVIE_ID, movie_id);
-        contentValues.put(FavoriteEntry.COLUMN_MOVIE_TITLE, movie_title);
+        contentValues.put(FavoriteEntry.COLUMN_MOVIE_TITLE, movie_title == null? "" : movie_title);
         getContentResolver().insert(FavoriteContract.CONTENT_URI, contentValues);
     }
 
@@ -164,8 +164,11 @@ public class DetailActivity extends AppCompatActivity {
         );
         try {
             if (cursor != null && cursor.moveToFirst()) { //Thanks to StackOverflow: https://stackoverflow.com/questions/10244222/android-database-cursorindexoutofboundsexception-index-0-requested-with-a-size
-                return cursor.getLong(cursor.getColumnIndex("_id"));
+                Long fav = cursor.getLong(cursor.getColumnIndex("_id"));
+                Log.d("DB-query", "Favorit found " + fav);
+                return fav;
             } else {
+                Log.d("DB-query", "Favorit not found ");
                 return null;
             }
         }
