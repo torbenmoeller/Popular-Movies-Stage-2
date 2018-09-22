@@ -93,7 +93,7 @@ public class DetailActivity extends AppCompatActivity {
 
     private void fillActivity(MovieContainer container, String completePath) {
         try {
-            Picasso.with(getApplicationContext())
+            Picasso.get()
                     .load(completePath)
                     .into(imageView);
             MovieDb movieDb = container.getMovieDb();

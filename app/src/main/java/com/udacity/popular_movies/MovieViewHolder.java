@@ -54,7 +54,7 @@ public class MovieViewHolder extends RecyclerView.ViewHolder
         this.movie = movieDb;
         Log.d("Picasso", "Get pic from path " + completePath);
         if(completePath!= null) {
-            Picasso.with(context)
+            Picasso.get()
                     .load(completePath)
                     .into(imageView);
         }else { //reset
